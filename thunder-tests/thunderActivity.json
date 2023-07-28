@@ -1,0 +1,21 @@
+[
+    {
+        "_id": "ddfad871-a583-4090-bbc3-9ab32b7f475d",
+        "colId": "history",
+        "containerId": "",
+        "name": "ws://localhost:3000/ws",
+        "url": "ws://localhost:3000/ws",
+        "method": "GET",
+        "sortNum": 0,
+        "created": "2023-07-28T02:04:02.464Z",
+        "modified": "2023-07-28T02:04:02.464Z",
+        "headers": [],
+        "params": [],
+        "body": {
+            "type": "json",
+            "raw": "{\n    \"cron\": \"*/1 * * * * *\"\n}",
+            "form": []
+        },
+        "tests": []
+    }
+]
