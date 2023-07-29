@@ -7,14 +7,16 @@ class PanelPage extends StatelessWidget {
   const PanelPage({super.key});
   @override
   Widget build(BuildContext context) {
-    ///put web view to show esp 32 cam here
-    return Scaffold(body:
-        BlocBuilder<WebSocketConnectionBloc, WebSocketConnectionState>(
-            builder: (context, state) {
-      return Column(children: [
-        Text("Water level ( Weight of plate ): ${state.connected}"),
-        const Text("This is the panel that will show the water level weight pressure plate."),
-      ]);
-    }));
+    return Scaffold(
+      body: BlocBuilder<WebSocketConnectionBloc, WebSocketConnectionState>(builder: (blocContext, state) {
+        if (state.connected) {
+          return Column(children: [
+            Text("Connected: ${state.connected}"),
+            Text("Teste message"),
+          ]);
+        }
+        return Text("No connected.");
+      }),
+    );
   }
 }

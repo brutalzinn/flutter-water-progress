@@ -1,20 +1,13 @@
 import 'dart:convert';
-
 import 'package:equatable/equatable.dart';
 
-
-//separe this class after with response data from web socket
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 class WebSocketConnectionState extends Equatable {
   final String gateway;
   final int port;
   final String address;
   final bool connected;
   const WebSocketConnectionState(
-      {this.address = "192.168.0.155",
-      this.gateway = "192.168.0.1",
-      this.port = 5000,
-      this.connected = false});
+      {this.address = "192.168.0.81", this.gateway = "192.168.0.1", this.port = 8080, this.connected = false});
 
   String toUrl() => 'ws://$address:$port';
 
@@ -53,8 +46,7 @@ class WebSocketConnectionState extends Equatable {
   String toJson() => json.encode(toMap());
 
   factory WebSocketConnectionState.fromJson(String source) =>
-      WebSocketConnectionState.fromMap(
-          json.decode(source) as Map<String, dynamic>);
+      WebSocketConnectionState.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   List<Object> get props => [gateway, port, address, connected];

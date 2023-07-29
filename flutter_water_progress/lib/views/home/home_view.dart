@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_water_progress/core/websocket/bloc/web_socket_connection_bloc.dart';
