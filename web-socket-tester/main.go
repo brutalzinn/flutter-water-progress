@@ -16,46 +16,30 @@ import (
 
 [BLOG.ROBERTOCPAES.DEV - HYPERFOCUS - PERSONAL DATA COMMENTARY - IGNORE]
 */
-
-type GoWebSocketTesterRequest struct {
-	Cron string `json:"cron"`
-}
 type GoWebsocketTesterResponse struct {
 	Type  string `json:"type"`
 	Value int    `json:"value"`
 }
 
 func main() {
-	//really like express. i like it.
 	counterMax := 100
 	app := fiber.New()
-	app.Get("/ws", websocket.New(func(c *websocket.Conn) {
-		//lets start a new goroutine that can send a random increment message to the flutter app and we can plot the gauge.
-		for {
-			s := gocron.NewScheduler(time.UTC)
-			var GoWebSocketTesterRequest GoWebSocketTesterRequest
-			err := c.ReadJSON(&GoWebSocketTesterRequest)
-			if err != nil {
-				break
-			}
-			log.Printf("Received: %s", GoWebSocketTesterRequest)
-			counter := 0
-			s.CronWithSeconds(GoWebSocketTesterRequest.Cron).Do(func() {
-				c.WriteJSON(GoWebsocketTesterResponse{Value: counter, Type: "weight"})
-				counter++
-				log.Println("Running %s", time.Now())
-			})
-			c.WriteJSON(GoWebSocketTesterRequest)
-			if err != nil {
-				break
-			}
-			if counter >= counterMax {
-				counter = 0
-			}
-			s.StartBlocking()
+	s := gocron.NewScheduler(time.Local)
+	cron := "*/5 * * * * *"
+	counter := 0
+	s.CronWithSeconds(cron).Do(func() {
+		if counter >= counterMax {
+			counter = 0
 		}
-
+		counter++
+	})
+	s.StartAsync()
+	app.Get("/", websocket.New(func(c *websocket.Conn) {
+		log.Printf("client connected %s", c.RemoteAddr())
+		for {
+			c.WriteJSON(GoWebsocketTesterResponse{Value: counter, Type: "weight"})
+			time.Sleep(time.Duration(1) * time.Second)
+		}
 	}))
-
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(":80"))
 }

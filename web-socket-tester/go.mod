@@ -3,6 +3,7 @@ module github.com/brutalzinn/flutter-water-progress
 go 1.20
 
 require (
+	github.com/go-co-op/gocron v1.30.1
 	github.com/gofiber/fiber v1.14.6
 	github.com/gofiber/websocket v0.5.1
 )
@@ -10,7 +11,6 @@ require (
 require (
 	github.com/andybalholm/brotli v1.0.0 // indirect
 	github.com/fasthttp/websocket v1.4.3-beta.1 // indirect
-	github.com/go-co-op/gocron v1.30.1 // indirect
 	github.com/gofiber/utils v0.0.10 // indirect
 	github.com/gorilla/schema v1.1.0 // indirect
 	github.com/klauspost/compress v1.10.7 // indirect
