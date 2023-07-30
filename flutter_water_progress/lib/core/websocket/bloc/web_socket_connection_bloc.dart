@@ -11,12 +11,13 @@ import 'web_socket_connection_state.dart';
 class WebSocketConnectionBloc extends Bloc<WebSocketConnectionEvent, WebSocketConnectionState> {
   late WebSocketChannel _channel;
   //Yeah. Wrong use of states. but.. usina info says to me the sensor i will only get after weekend.
-  static const initialState = WebSocketConnectionState();
+  static const initialState =
+      WebSocketConnectionState(webServerPort: 8080, webSocketPort: 8000, gateway: "192.168.0.1");
   WebSocketConnectionBloc() : super(initialState) {
     Future<void> _connect(OnConnect event, Emitter<WebSocketConnectionState> emit) async {
       debugPrint("Auto run esp at the network ${state.gateway}.");
       emit(state.copyWith(connectionStatus: ConnectionStatus.CONNECTING, searchingStatus: SearchingStatus.SEARCHING));
-      final networkUtil = NetworkUtil("192.168.0.1", 8080);
+      final networkUtil = NetworkUtil("192.168.0.1", state.webServerPort);
       debugPrint("pre esp searching");
       final addressEspFound = await networkUtil.findEspUrlOnNetwork();
       debugPrint("found $addressEspFound");
@@ -25,21 +26,20 @@ class WebSocketConnectionBloc extends Bloc<WebSocketConnectionEvent, WebSocketCo
           debugPrint("cant be searched");
           emit(state.copyWith(
               connectionStatus: ConnectionStatus.DISCONNECTED, searchingStatus: SearchingStatus.NOT_FOUND));
-          throw Exception("cant search for esp");
+          return;
         }
-        emit(state.copyWith(
-            address: addressEspFound,
-            connectionStatus: ConnectionStatus.CONNECTED,
-            searchingStatus: SearchingStatus.FOUND));
+        emit(state.copyWith(address: addressEspFound, searchingStatus: SearchingStatus.FOUND));
         debugPrint("esp found at ${addressEspFound}");
         debugPrint("trying to connect");
+        emit(state.copyWith(address: addressEspFound, connectionStatus: ConnectionStatus.CONNECTING));
         final url = state.toWebSocketUrl();
         _channel = WebSocketChannel.connect(Uri.parse(url));
         _channel.sink.add("hand");
-        emit(state.copyWith(connected: true));
+        emit(state.copyWith(connected: true, connectionStatus: ConnectionStatus.CONNECTED));
+
         await emit.onEach<dynamic>(_channel.stream, onData: (data) => add(OnEspResponse(data)));
       } on WebSocketChannelException catch (e) {
-        emit(state.copyWith(connected: false));
+        emit(state.copyWith(connected: false, connectionStatus: ConnectionStatus.DISCONNECTED));
       }
     }
 

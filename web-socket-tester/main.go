@@ -41,5 +41,9 @@ func main() {
 			time.Sleep(time.Duration(1) * time.Second)
 		}
 	}))
+	app.Get("/ping", func(c *fiber.Ctx) {
+		log.Printf("handshake accepted by %s", c.IP())
+		c.SendString("pong")
+	})
 	log.Fatal(app.Listen(":80"))
 }

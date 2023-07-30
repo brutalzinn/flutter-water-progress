@@ -10,8 +10,8 @@ class NetworkUtil {
   String _gatewayIp = "";
 
   /// like 192.168.0.{possible_point}
+  /// strategy is search around the local network ips avaible using the gateway schema and a especify port.
   NetworkUtil(this.gateway, this.port);
-
   Future<String?> findEspUrlOnNetwork() async {
     final gatewayIpSplit = gateway.split('.');
     gatewayIpSplit.removeLast();

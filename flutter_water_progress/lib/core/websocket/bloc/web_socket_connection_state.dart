@@ -4,7 +4,9 @@ import '../models/connection_status.dart';
 
 class WebSocketConnectionState extends Equatable {
   final String? gateway;
-  final int port;
+  //because the esp cannot handle much..
+  final int webServerPort;
+  final int webSocketPort;
   final String? address;
   final ConnectionStatus connectionStatus;
   final SearchingStatus searchingStatus;
@@ -12,11 +14,13 @@ class WebSocketConnectionState extends Equatable {
   const WebSocketConnectionState(
       {this.address,
       this.gateway,
-      this.port = 8080,
+      this.webServerPort = 8080,
+      this.webSocketPort = 8000,
       this.searchingStatus = SearchingStatus.NOT_FOUND,
       this.connectionStatus = ConnectionStatus.DISCONNECTED});
 
-  String toWebSocketUrl() => 'ws://$address:$port';
+  String toWebSocketUrl() => 'ws://$address:$webSocketPort';
+  String toWebServerUrl() => 'http://$address:$webServerPort';
 
   WebSocketConnectionState copyWith(
       {String? gateway,
@@ -27,14 +31,15 @@ class WebSocketConnectionState extends Equatable {
       SearchingStatus? searchingStatus}) {
     return WebSocketConnectionState(
         gateway: gateway ?? this.gateway,
-        port: port ?? this.port,
+        webServerPort: port ?? this.webServerPort,
+        webSocketPort: port ?? this.webSocketPort,
         address: address ?? this.address,
         searchingStatus: searchingStatus ?? this.searchingStatus,
         connectionStatus: connectionStatus ?? this.connectionStatus);
   }
 
   @override
-  List<Object> get props => [port, connectionStatus, searchingStatus];
+  List<Object> get props => [connectionStatus, searchingStatus];
 }
 
 class EspResponse extends WebSocketConnectionState {
