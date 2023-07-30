@@ -1,55 +1,40 @@
-import 'dart:convert';
 import 'package:equatable/equatable.dart';
 
+import '../models/connection_status.dart';
+
 class WebSocketConnectionState extends Equatable {
-  final String gateway;
+  final String? gateway;
   final int port;
-  final String address;
-  final bool connected;
+  final String? address;
+  final ConnectionStatus connectionStatus;
+  final SearchingStatus searchingStatus;
+
   const WebSocketConnectionState(
-      {this.address = "192.168.0.81", this.gateway = "192.168.0.1", this.port = 8080, this.connected = false});
+      {this.address,
+      this.gateway,
+      this.port = 8080,
+      this.searchingStatus = SearchingStatus.NOT_FOUND,
+      this.connectionStatus = ConnectionStatus.DISCONNECTED});
 
-  String toUrl() => 'ws://$address:$port';
+  String toWebSocketUrl() => 'ws://$address:$port';
 
-  WebSocketConnectionState copyWith({
-    String? gateway,
-    int? port,
-    String? address,
-    bool? connected,
-  }) {
+  WebSocketConnectionState copyWith(
+      {String? gateway,
+      int? port,
+      String? address,
+      bool? connected,
+      ConnectionStatus? connectionStatus,
+      SearchingStatus? searchingStatus}) {
     return WebSocketConnectionState(
-      gateway: gateway ?? this.gateway,
-      port: port ?? this.port,
-      address: address ?? this.address,
-      connected: connected ?? this.connected,
-    );
+        gateway: gateway ?? this.gateway,
+        port: port ?? this.port,
+        address: address ?? this.address,
+        searchingStatus: searchingStatus ?? this.searchingStatus,
+        connectionStatus: connectionStatus ?? this.connectionStatus);
   }
-
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'gateway': gateway,
-      'port': port,
-      'address': address,
-      'connected': connected,
-    };
-  }
-
-  factory WebSocketConnectionState.fromMap(Map<String, dynamic> map) {
-    return WebSocketConnectionState(
-      gateway: map['gateway'] as String,
-      port: map['port'] as int,
-      address: map['address'] as String,
-      connected: map['connected'] as bool,
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory WebSocketConnectionState.fromJson(String source) =>
-      WebSocketConnectionState.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  List<Object> get props => [gateway, port, address, connected];
+  List<Object> get props => [port, connectionStatus, searchingStatus];
 }
 
 class EspResponse extends WebSocketConnectionState {

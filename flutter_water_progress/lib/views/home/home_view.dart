@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_water_progress/core/websocket/bloc/web_socket_connection_bloc.dart';
 import 'package:flutter_water_progress/core/websocket/bloc/web_socket_connection_state.dart';
 import 'package:flutter_water_progress/core/websocket/bloc/web_socket_event.dart';
+import 'package:flutter_water_progress/core/websocket/models/connection_status.dart';
 import 'package:flutter_water_progress/views/panel/panel_view.dart';
 
 class HomePage extends StatelessWidget {
@@ -12,7 +13,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<WebSocketConnectionBloc, WebSocketConnectionState>(
       listener: (listenerContext, state) {
-        if (state.connected) {
+        if (state.connectionStatus == ConnectionStatus.CONNECTED) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const PanelPage()),
