@@ -36,7 +36,6 @@ class WebSocketConnectionBloc extends Bloc<WebSocketConnectionEvent, WebSocketCo
         _channel = WebSocketChannel.connect(Uri.parse(url));
         _channel.sink.add("hand");
         emit(state.copyWith(connected: true, connectionStatus: ConnectionStatus.CONNECTED));
-
         await emit.onEach<dynamic>(_channel.stream, onData: (data) => add(OnEspResponse(data)));
       } on WebSocketChannelException catch (e) {
         emit(state.copyWith(connected: false, connectionStatus: ConnectionStatus.DISCONNECTED));

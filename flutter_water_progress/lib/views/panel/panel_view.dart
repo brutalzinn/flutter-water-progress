@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_water_progress/core/websocket/bloc/web_socket_connection_bloc.dart';
 import 'package:flutter_water_progress/core/websocket/bloc/web_socket_connection_state.dart';
-import 'package:flutter_water_progress/core/websocket/bloc/web_socket_event.dart';
 import 'package:flutter_water_progress/core/websocket/models/connection_status.dart';
 
 class PanelPage extends StatelessWidget {

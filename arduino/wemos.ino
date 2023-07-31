@@ -9,16 +9,16 @@ ESP8266WebServer server(WEB_PORT);
 #define CLK 16
 #define DT 12
 #define SW 13
+// Notify pin output
+#define BUZZER 0
 
 int weight = 0;
 int currentStateCLK;
 int lastStateCLK;
-String currentDir ="";
+String DIRECTION  = "";
 unsigned long lastButtonPress = 0;
 unsigned long last_10sec = 0;
 unsigned int counter = 0;
-
-
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght) {
 
   switch (type) {
@@ -46,6 +46,7 @@ void setup() {
   Serial.begin(115200);
   pinMode(CLK,INPUT);
 	pinMode(DT,INPUT);
+  pinMode(BUZZER, OUTPUT);
 	pinMode(SW, INPUT_PULLUP);
   lastStateCLK = digitalRead(CLK);
 
@@ -60,6 +61,7 @@ void setup() {
   webSocket.begin();
   server.begin();
   server.on("/ping", []() {
+    notifyAlarm();
     server.send(200, "text/plain", "pong");
   });
   webSocket.onEvent(webSocketEvent);
@@ -92,16 +94,13 @@ void encoderEvent(){
 	currentStateCLK = digitalRead(CLK);
 	if (currentStateCLK != lastStateCLK  && currentStateCLK == 1){
     uint currentValue = digitalRead(DT);
-		if (currentValue != currentStateCLK) {
-      if (weight > 0){
-			  weight--;
-      }
-			currentDir ="CCW";
-		} else {
-			// Encoder is rotating CW so increment
-			weight++;
-			currentDir ="CW";
-		}
+    if (currentValue != currentStateCLK && weight > 0){
+      weight--;
+			DIRECTION ="CCW";
+      return;
+    }
+    weight++;
+    DIRECTION ="CW";
     Serial.println(weight);
 	}
 	lastStateCLK = currentStateCLK;
@@ -109,9 +108,15 @@ void encoderEvent(){
 	if (btnState == LOW) {
 		if (millis() - lastButtonPress > 50) {
 			Serial.println("Button pressed!");
-      webSocket.broadcastTXT(String(weight));
+      webSocket.broadcastTXT("{}");
 		}
 		lastButtonPress = millis();
 	}
 	delay(1);
+}
+
+void notifyAlarm(){
+    digitalWrite(BUZZER, HIGH);
+    delay(100);
+    digitalWrite(BUZZER, LOW);
 }

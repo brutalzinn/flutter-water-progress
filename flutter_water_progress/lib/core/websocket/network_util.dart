@@ -26,21 +26,22 @@ class NetworkUtil {
     /// thanks chat gpt for really help it.
     /// no. this is not the same that we already done with simple robot and web socket connection.
     /// The flutter performace analyzer its ok to use with this at ios emulator.
+    ///
+    final espFoundAddress = await _findEsp(ipAddresses);
+    return espFoundAddress;
+  }
+
+  Future<String?> _findEsp(List<String> ipAddresses) async {
+    int completedIsolates = 0;
+    final List<Isolate> isolates = [];
     final completer = Completer<String?>();
     void handleResponse(String? ipAddress) {
       if (!completer.isCompleted && ipAddress != null) {
         completer.complete(ipAddress);
+        _cancelIsolates(isolates);
       }
     }
 
-    void cancelIsolates(List<Isolate> isolates) {
-      for (final isolate in isolates) {
-        isolate.kill(priority: Isolate.immediate);
-      }
-    }
-
-    int completedIsolates = 0;
-    final List<Isolate> isolates = [];
     for (final ipAddress in ipAddresses) {
       final receivePort = ReceivePort();
       final isolate = await Isolate.spawn(_performHttpGet, {'ipAddress': ipAddress, 'sendPort': receivePort.sendPort});
@@ -48,7 +49,6 @@ class NetworkUtil {
       receivePort.listen((message) {
         if (message is String) {
           handleResponse(message);
-          cancelIsolates(isolates);
         } else {
           completedIsolates++;
           if (completedIsolates == ipAddresses.length && !completer.isCompleted) {
@@ -59,6 +59,12 @@ class NetworkUtil {
       });
     }
     return completer.future;
+  }
+
+  void _cancelIsolates(List<Isolate> isolates) {
+    for (final isolate in isolates) {
+      isolate.kill(priority: Isolate.immediate);
+    }
   }
 
   void _performHttpGet(Map<String, dynamic> message) async {
